@@ -21,3 +21,9 @@ Medium -> 1
 High -> 2
 
 If one types word that is not a command, bot repeats it and points out that it doesn't know this command.
+
+Yet to be done:
+1. Finish task
+2. Set priority to existing task
+3. Reminders
+4. To be continued
