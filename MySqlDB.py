@@ -13,19 +13,21 @@ class MySqlDB(DBInterface):
     def add(user_id, task) -> int:
         cursor = cnx.cursor()
         add_task_query = ("INSERT INTO tasks "
-                        "(name, user_id, priority, created_at, updated_at) "
-                        "VALUES (%s, %s, 0, now(), now())")
+                          "(name, user_id, priority, created_at, updated_at) "
+                          "VALUES (%s, %s, 0, now(), now())")
         data_task = (task, user_id)
         cursor.execute(add_task_query, data_task)
         task_id = cursor.lastrowid
         cnx.commit()
         return task_id
 
-    def get_list(user_id) -> list:
+    def get_list(user_id, filter="") -> list:
         logger.info("Get tasks for user. user_id={}".format(user_id))
 
         cursor = cnx.cursor()
-        query = ("SELECT task_id, name FROM tasks ORDER BY priority DESC, name ASC")
+        where = "WHERE priority={0}".format(filter) if filter != "" else filter
+        query = ("SELECT task_id, name FROM tasks {0} ORDER BY priority DESC, name ASC".format(where))
+
         cursor.execute(query)
 
         result = []

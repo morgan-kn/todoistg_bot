@@ -1,7 +1,7 @@
 from telegram import __version__ as TG_VER
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from todoistbot.credentials import bot_token
-from Commands import start, help_command, add, list, button, unknown
+from Commands import start, help_command, add, list, button, unknown, filter as bot_filter
 
 try:
     from telegram import __version_info__
@@ -23,6 +23,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("add", add))
     application.add_handler(CommandHandler("list", list))
+    application.add_handler(CommandHandler("filter", bot_filter))
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, unknown))
 

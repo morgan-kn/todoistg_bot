@@ -64,5 +64,18 @@ async def list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('\n'.join(tasks))
 
 
+async def filter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    filter = ' '.join(update.message.text.split(' ')[1:])
+    if filter == '':
+        await update.message.reply_text("Filter can't be empty")
+    else:
+        tasks = MySqlDB.MySqlDB.get_list(update.effective_user.id, filter)
+        await update.message.reply_text('\n'.join(tasks))
+
+
+async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    pass
+
+
 async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("Sorry, I have no idea what '{0}' means.".format(update.message.text))
