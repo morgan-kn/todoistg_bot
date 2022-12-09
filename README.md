@@ -12,7 +12,7 @@ _/help_ -> this command shows help
 
 _/start_ -> Send a message when the command /start is issued.
 
-_/filter id -> shows list of tasks with priority equal to id
+_/filter id_ -> shows list of tasks with priority equal to id
 
 
 Priorities:
