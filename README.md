@@ -12,4 +12,12 @@ _/help_ -> this command shows help
 
 _/start_ -> Send a message when the command /start is issued.
 
+_/filter id -> shows list of tasks with priority equal to id
+
+
+Priorities:
+Low -> 0
+Medium -> 1
+High -> 2
+
 If one types word that is not a command, bot repeats it and points out that it doesn't know this command.
