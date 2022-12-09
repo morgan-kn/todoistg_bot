@@ -1,13 +1,11 @@
-from telegram import ForceReply, Update
+from telegram import ForceReply, Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-
-import FileDB
-import MemoryDB
+import MySqlDB
 from logger import logger
+import json
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_html(
         rf"Hi {user.mention_html()}! I can /add <text>, /list, /help",
@@ -16,11 +14,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("No one's gonna help you! DIY!")
-
-
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(update.message.text)
+    message = """I can /add <task> with some priority that you define. 
+    I can show you all your tasks if you call list. """
+    await update.message.reply_text(message)
 
 
 async def add(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -29,15 +25,44 @@ async def add(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("Task can't be empty")
     else:
         user_id = update.effective_user.id
-        if FileDB.FileDb.add(user_id, task):
+        task_id = MySqlDB.MySqlDB.add(user_id, task)
+        if task_id > 0:
             logger.info(update.message.from_user.id)
-            await update.message.reply_text("Task \"{0}\" has been saved".format(task))
+
+            keyboard = [[
+                InlineKeyboardButton("Low",
+                                     callback_data=json.dumps({'type': 'priority', 'task_id': task_id, 'priority': 0})),
+                InlineKeyboardButton("Medium",
+                                     callback_data=json.dumps({'type': 'priority', 'task_id': task_id, 'priority': 1})),
+                InlineKeyboardButton("High",
+                                     callback_data=json.dumps({'type': 'priority', 'task_id': task_id, 'priority': 2})),
+            ]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await update.message.reply_text("Please set priority:", reply_markup=reply_markup)
+            # await update.message.reply_text("Task \"{0}\" has been saved".format(task))
         else:
             logger.error("Couldn't save a task")
 
 
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    request = json.loads(update.callback_query.data)
+    if request['type'] == "priority":
+        await query.edit_message_text(text=f"Selected priority: {request['priority']}")
+        MySqlDB.MySqlDB.set_priority(update.effective_user.id, request["task_id"], request["priority"])
+    else:
+        await query.edit_message_text(text=f"Unknown button")
+
+
 async def list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    tasks = FileDB.FileDb.get_list(update.effective_user.id)
+    tasks = MySqlDB.MySqlDB.get_list(update.effective_user.id)
     if len(tasks) == 0:
         await update.message.reply_text("You have no tasks")
     await update.message.reply_text('\n'.join(tasks))
+
+
+async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("Sorry, I have no idea what '{0}' means.".format(update.message.text))
