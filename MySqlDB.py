@@ -1,11 +1,8 @@
 import mysql.connector
 
-from dbInterface import DBInterface
-import time
 from logger import logger
 
-
-class MySqlDB(DBInterface):
+class MySqlDB():
     global cnx
     cnx = mysql.connector.connect(user='root', database='todoist', password='root')
 
