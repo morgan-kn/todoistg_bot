@@ -8,7 +8,7 @@ import json
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = update.effective_user
     await update.message.reply_html(
-        rf"Hi {user.mention_html()}! I can /add <text>, /list, /help",
+        rf"Hi {user.mention_html()}! I can /add task_name, /list, /help",
         reply_markup=ForceReply(selective=True),
     )
 
