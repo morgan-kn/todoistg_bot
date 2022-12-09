@@ -61,7 +61,7 @@ async def list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     tasks = MySqlDB.MySqlDB.get_list(update.effective_user.id)
     if len(tasks) == 0:
         await update.message.reply_text("You have no tasks")
-    await update.message.reply_text('\n'.join(tasks))
+    await update.message.reply_text('\n'.join(map(lambda t : t["name"], tasks)))
 
 
 async def filter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -70,7 +70,7 @@ async def filter(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("Filter can't be empty")
     else:
         tasks = MySqlDB.MySqlDB.get_list(update.effective_user.id, filter)
-        await update.message.reply_text('\n'.join(tasks))
+        await update.message.reply_text('\n'.join(map(lambda t : t["name"], tasks)))
 
 
 async def finish(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

@@ -22,15 +22,18 @@ class MySqlDB():
         logger.info("Get tasks for user. user_id={}".format(user_id))
 
         cursor = cnx.cursor()
-        where = "WHERE priority={0}".format(filter) if filter != "" else filter
-        query = ("SELECT task_id, name FROM tasks {0} ORDER BY priority DESC, name ASC".format(where))
+        if filter != "":
+            query = "SELECT task_id, name, priority FROM tasks WHERE user_id = %s AND priority = %s ORDER BY priority DESC, name ASC"
+            cursor.execute(query, (user_id, filter))
+        else:
+            query = "SELECT task_id, name, priority FROM tasks WHERE user_id = %s ORDER BY priority DESC, name ASC"
+            cursor.execute(query, (user_id,))
 
-        cursor.execute(query)
 
         result = []
-        for (task_id, name) in cursor:
+        for (task_id, name, priority) in cursor:
             logger.info("Task '{}' '{}'".format(task_id, name))
-            result.append(name)
+            result.append({"id": task_id, "name": name, "priority" : priority})
 
         return result
 
